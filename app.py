@@ -16,15 +16,16 @@ CHAT_SYSTEM = {
     )
 }
 
-chat_history = [CHAT_SYSTEM]
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_msg = request.json["message"]
+    user_msg = request.json.get("message", "")
 
+    # Chat history creata per ogni richiesta (no globale)
+    chat_history = [CHAT_SYSTEM]
     chat_history.append({"role": "user", "content": user_msg})
+
     reply = call_ai(API_KEY, chat_history)
-    chat_history.append({"role": "assistant", "content": reply})
 
     return jsonify({"reply": reply})
 
@@ -33,10 +34,8 @@ def chat():
 def new_mail():
     mail = generate_mail(API_KEY)
     return jsonify(mail)
-    
-import os
+
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
