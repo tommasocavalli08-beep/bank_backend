@@ -31,15 +31,22 @@ def generate_mail(api_key):
                 "Genera una mail interna per un operatore di banca. "
                 "Tema realistico (mutuo, audit, segnalazione sospetta, cliente). "
                 "Scrivi titolo e corpo separati da ||."
+                "Scrivi in formato JSON: {\"title\": \"...\", \"body\": \"...\"}"
             )
         }
     ]
 
     text = call_ai(api_key, messages, temperature=0.9)
-    title, body = text.split("||", 1)
+
+    # ====== QUI il fix ======
+    if "||" in text:
+        title, body = text.split("||", 1)
+    else:
+        # se l'AI non mette ||, crea un titolo automatico
+        title = "Mail interna — " + text[:30].strip()
+        body = text
 
     return {
         "title": title.strip(),
         "body": body.strip()
     }
-
