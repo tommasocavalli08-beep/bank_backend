@@ -1,6 +1,6 @@
 import requests
 
-OLLAMA_URL = "https://ollama.com/api/chat"
+OLLAMA_URL = "https://api.ollama.com/v1/chat"
 MODEL = "cogito-2.1:671b"
 
 def call_ai(api_key, messages, temperature=0.7):
@@ -24,19 +24,15 @@ def call_ai(api_key, messages, temperature=0.7):
 
 
 def generate_mail(api_key):
-   messages = [
-  {
-    "role": "system",
-    "content": (
-      "Genera una mail interna per un operatore di banca. "
-      "Scegli un tema a caso tra: mutuo, audit, segnalazione sospetta, "
-      "cliente, contabilità, reclamo, compliance, sicurezza, marketing, "
-      "formazione, HR. "
-      "Scrivi titolo e corpo separati da ||."
-    )
-  }
-]
-
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "Genera una mail interna per un operatore di banca. "
+                "Tema realistico (mutuo, audit, segnalazione sospetta, cliente). "
+                "Scrivi titolo e corpo separati da ||."
+            )
+        }
     ]
 
     text = call_ai(api_key, messages, temperature=0.9)
@@ -46,5 +42,3 @@ def generate_mail(api_key):
         "title": title.strip(),
         "body": body.strip()
     }
-
-
