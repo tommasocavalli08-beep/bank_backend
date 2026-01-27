@@ -1,6 +1,6 @@
 import requests
 
-OLLAMA_URL = "https://ollama.com/api/chat"
+OLLAMA_URL = "https://api.ollama.com/v1/chat"
 MODEL = "cogito-2.1:671b"
 
 def call_ai(api_key, messages, temperature=0.7):
