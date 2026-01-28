@@ -25,8 +25,6 @@ def call_ai(api_key, messages, temperature=0.45):
 
 def generate_mail(api_key):
     messages = [
-        {
-            messages = [
     {
         "role": "system",
         "content": (
@@ -51,13 +49,11 @@ def generate_mail(api_key):
 
             "ESEMPIO CORRETTO:\n"
             "Richiesta chiarimenti su finanziamento || Gentile collega, ti segnalo che..."
-        )
-    }
-]
-
             )
         }
     ]
+    
+
 
     text = call_ai(api_key, messages, temperature=0.9)
 
@@ -73,4 +69,5 @@ def generate_mail(api_key):
         "title": title.strip(),
         "body": body.strip()
     }
+
 
