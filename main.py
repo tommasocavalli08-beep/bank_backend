@@ -16,7 +16,9 @@ CHAT_SYSTEM = {
 
 chat_history = [CHAT_SYSTEM]
 
+# =====================
 # STATO GIOCO
+# =====================
 bank_fund = 1_000_000
 
 @app.route("/chat", methods=["POST"])
@@ -34,7 +36,6 @@ def chat():
 def new_mail():
     mail = generate_mail(API_KEY)
 
-    # assegna tipo e importo
     mail_type = random.choice(["loan", "fraud", "audit", "generic"])
     amount = random.randint(5_000, 150_000) if mail_type == "loan" else 0
 
@@ -57,7 +58,9 @@ def decision():
     if data["type"] == "fraud" and data["action"] == "SEGNALATA":
         bank_fund += 20_000
 
-    return jsonify({"bank_fund": bank_fund})
+    return jsonify({
+        "bank_fund": bank_fund
+    })
 
 
 @app.route("/status", methods=["GET"])
