@@ -1,9 +1,13 @@
 import requests
+import random
 
 OLLAMA_URL = "https://ollama.com/api/chat"
 MODEL = "cogito-2.1:671b"
 
-def call_ai(api_key, messages, temperature=0.45):
+NOMI = ["Marco", "Luca", "Giulia", "Anna", "Paolo", "Sara", "Davide"]
+COGNOMI = ["Rossi", "Bianchi", "Verdi", "Conti", "Moretti", "Gallo", "Ferrari"]
+
+def call_ai(api_key, messages, temperature=0.7):
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
@@ -18,56 +22,50 @@ def call_ai(api_key, messages, temperature=0.45):
 
     r = requests.post(OLLAMA_URL, json=payload, headers=headers)
     r.raise_for_status()
-    data = r.json()
-
-    return data["message"]["content"]
+    return r.json()["message"]["content"]
 
 
 def generate_mail(api_key):
-    messages = [
-    {
-        "role": "system",
-        "content": (
-            "Sei un generatore di email per un videogioco gestionale bancario.\n"
-            "Devi generare UNA mail realistica ogni volta.\n\n"
+    nome = random.choice(NOMI)
+    cognome = random.choice(COGNOMI)
 
-            "REGOLE OBBLIGATORIE:\n"
-            "- NON usare JSON\n"
-            "- NON usare virgolette\n"
-            "- NON scrivere spiegazioni\n"
-            "- NON scrivere parentesi quadre o segnaposto\n"
-            "- NON ripetere la parola titolo o body\n\n"
+    system_prompt = f"""
+Sei un sistema interno di una banca.
+Genera UNA mail realistica.
+NON usare JSON.
+NON usare parentesi.
+NON scrivere spiegazioni.
 
-            "FORMATO OBBLIGATORIO (UNA SOLA VOLTA):\n"
-            "Titolo della mail || Corpo della mail\n\n"
+Formato OBBLIGATORIO (una sola volta):
+TITOLO:
+<titolo>
 
-            "CONTENUTO:\n"
-            "- Inventa sempre nome e cognome realistici italiani\n"
-            "- Inventa casi bancari diversi (prestiti, mutui, frodi, audit, reclami, investimenti)\n"
-            "- Tono professionale interno\n"
-            "- Lunghezza media\n\n"
+CORPO:
+<testo>
 
-            "ESEMPIO CORRETTO:\n"
-            "Richiesta chiarimenti su finanziamento || Gentile collega, ti segnalo che..."
-            )
+Usa nomi realistici (es: {nome} {cognome}).
+Temi possibili:
+- mutuo
+- prestito
+- segnalazione sospetta
+- audit
+- investimento
+"""
+
+    text = call_ai(api_key, [
+        {"role": "system", "content": system_prompt}
+    ], temperature=0.9)
+
+    if "CORPO:" not in text:
+        return {
+            "title": "Comunicazione interna",
+            "body": text.strip()
         }
-    ]
-    
 
-
-    text = call_ai(api_key, messages, temperature=0.9)
-
-    # ====== QUI il fix ======
-    if "||" in text:
-        title, body = text.split("||", 1)
-    else:
-        # se l'AI non mette ||, crea un titolo automatico
-        title = "Mail interna — " + text[:30].strip()
-        body = text
+    title = text.split("TITOLO:")[1].split("CORPO:")[0].strip()
+    body = text.split("CORPO:")[1].strip()
 
     return {
-        "title": title.strip(),
-        "body": body.strip()
+        "title": title,
+        "body": body
     }
-
-
